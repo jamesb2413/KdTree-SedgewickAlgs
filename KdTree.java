@@ -205,7 +205,8 @@ public class KdTree {
     private Point2D nearest(Node subRoot, Point2D p, double soFar) {
         if (subRoot == null) return null;
         // distance from point in current node to p
-        double pointD = subRoot.p.distanceTo(p);
+        Point2D thisP = subRoot.p;
+        double pointD = thisP.distanceTo(p);
         if (pointD < soFar) soFar = pointD;
 
         RectHV lbRect = subRoot.lb.rect;
@@ -229,16 +230,21 @@ public class KdTree {
                     double rtNDist = rtNearest.distanceTo(p);
                     if (lbNDist <= rtNDist && lbNDist < soFar) return lbNearest;
                     else if (rtNDist < soFar) return rtNearest;
-                    else return subRoot.p;
+                    else return thisP;
                 }
             }
             else return lbNearest;
         }
         // only right subtree may have nearest point
-        if (rtRDist < soFar)
-    }
+        if (rtRDist < soFar) {
+            Point2D rtNearest = nearest(subRoot.rt, p, soFar);
+            double rtNDist = rtNearest.distanceTo(p);
+            if (rtNDist < soFar) return rtNearest;
+            else return thisP;
+        }
+        else return thisP;
 
-}
+    }
 
     public static void main(String[] args) {
         KdTree test = new KdTree();
